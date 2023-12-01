@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
+import DestinationComponent from "./components/DestinationComponent.vue";
 
 const base_url = "https://findfalcone.geektrust.com";
 
@@ -29,10 +30,10 @@ function get_token() {
 
 const refPlanetList = ref([]);
 
-const dest1 = ref("");
-const dest2 = ref("");
-const dest3 = ref("");
-const dest4 = ref("");
+const dest1 = ref(null);
+const dest2 = ref(null);
+const dest3 = ref(null);
+const dest4 = ref(null);
 function fetchPlanets() {
   const url = base_url + "/planets";
   const xhr = new XMLHttpRequest();
@@ -59,11 +60,9 @@ watch(isTokenAccessible, (newValue) => {
   }
 });
 const planetList = computed(() => {
-  return refPlanetList.value.map((item) => {
-    const toShow = ![dest1, dest2, dest3, dest4].some(
-      (dest) => dest.value.name === item.name
-    );
-    return { ...item, toShow };
+  return refPlanetList.value.map((planet, index) => {
+    const toShow=![dest1.value, dest2.value, dest3.value, dest4.value].includes(index.toString())
+    return { ...planet, toShow };
   });
 });
 
@@ -85,9 +84,10 @@ function fetchVehicles() {
   xhr.send();
   return refVehiclesList.value;
 }
-const vehicleList = computed(()=>{
+const vehicleList = computed(() => {
   return refVehiclesList.value;
-})
+});
+
 
 //Get token as soon as app starts
 onMounted(() => {
@@ -102,63 +102,40 @@ onMounted(() => {
         <h1>Finding Falcone</h1>
       </div>
     </div>
+    
     <div class="row">
       <div class="col">
-        <label for="dest1" class="text-nowrap">Destination 1</label>
-        <select id="dest1" v-model="dest1" class="form-control">
-          <option
-            v-for="planetItem in planetList"
-            :key="planetItem.distance"
-            :value="{ name: planetItem.name, distance: planetItem.distance }"
-            v-show="planetItem.toShow"
-          >
-            {{ planetItem.name }}
-          </option>
-        </select>
-        
+        <DestinationComponent
+          :planets="planetList"
+          :vehicles="vehicleList"
+          v-model:planet="dest1"
+        />
       </div>
       <div class="col">
-        <label for="dest2" class="text-nowrap">Destination 2</label>
-        <select id="dest2" v-model="dest2" class="form-control">
-          <option
-            v-for="planetItem in planetList"
-            :key="planetItem.distance"
-            :value="{ name: planetItem.name, distance: planetItem.distance }"
-            v-show="planetItem.toShow"
-          >
-            {{ planetItem.name }}
-          </option>
-        </select>
+        <DestinationComponent
+          :planets="planetList"
+          :vehicles="vehicleList"
+          v-model:planet="dest2"
+        />
       </div>
       <div class="col">
-        <label for="dest3" class="text-nowrap">Destination 3</label>
-        <select id="dest3" v-model="dest3" class="form-control">
-          <option
-            v-for="planetItem in planetList"
-            :key="planetItem.distance"
-            :value="{ name: planetItem.name, distance: planetItem.distance }"
-            v-show="planetItem.toShow"
-          >
-            {{ planetItem.name }}
-          </option>
-        </select>
+        <DestinationComponent
+          :planets="planetList"
+          :vehicles="vehicleList"
+          v-model:planet="dest3"
+        />
       </div>
       <div class="col">
-        <label for="dest4" class="text-nowrap">Destination 4</label>
-        <select id="dest4" v-model="dest4" class="form-control">
-          <option
-            v-for="planetItem in planetList"
-            :key="planetItem.distance"
-            :value="{ name: planetItem.name, distance: planetItem.distance }"
-            v-show="planetItem.toShow"
-          >
-            {{ planetItem.name }}
-          </option>
-        </select>
+        <DestinationComponent
+          :planets="planetList"
+          :vehicles="vehicleList"
+          v-model:planet="dest4"
+        />
       </div>
-      <div class="col"></div>
     </div>
   </div>
+
+  <h1></h1>
 </template>
 
 <style scoped>
