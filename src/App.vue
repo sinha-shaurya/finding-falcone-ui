@@ -19,7 +19,7 @@ function get_token() {
       token.value = response.token;
       isTokenAccessible.value = true;
     } else {
-      console.log("Error while getting response" + xhr.status);
+      console.error("Error while getting response" + xhr.status);
       token.value = "Error";
     }
   };
@@ -27,7 +27,6 @@ function get_token() {
 }
 
 //Planets API
-
 const refPlanetList = ref([]);
 
 const dest1 = ref(null);
@@ -45,7 +44,7 @@ function fetchPlanets() {
     if (xhr.status >= 200 && xhr.status < 300) {
       refPlanetList.value = JSON.parse(xhr.responseText);
     } else {
-      console.log("Error while getting response" + xhr.status);
+      console.error("Error while getting response" + xhr.status);
       refPlanetList.value = [];
     }
   };
@@ -92,7 +91,7 @@ function fetchVehicles() {
       refVehiclesList.value = JSON.parse(xhr.responseText);
       originalVehicleList.value = JSON.parse(xhr.responseText);
     } else {
-      console.log(xhr.status);
+      console.error(xhr.status);
     }
   };
   xhr.send();
@@ -122,7 +121,6 @@ const vehicleList = computed(() => {
 });
 
 const handleVehicleUpdate = (newValue) => {
-  console.log(newValue);
   switch (newValue.componentNumber) {
     case 1:
       pv1.value = v1.value;
@@ -144,26 +142,67 @@ const handleVehicleUpdate = (newValue) => {
 
 //Button Click Handling
 const time = ref(0);
+const foundPlanet = ref(null);
+const isSuccess = ref(null);
 
+function onClickButton() {
+  const url = base_url + "/find";
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  //set headers
+  xhr.setRequestHeader("Accept", "application/json");
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const response = JSON.parse(xhr.responseText);
+      //check for success
+      if (response.status === "false") {
+        isSuccess.value = false;
+      } else if (response.status === "success") {
+        isSuccess.value = true;
+        foundPlanet.value = response.planet_name;
+      }
+    }
+  };
+  const params = {
+    token: token.value,
+    planet_names: selectedPlanetNames.value,
+    vehicle_names: selectedVehicleNames.value,
+  };
+  xhr.send(JSON.stringify(params));
+}
+
+const selectedPlanetNames = computed(() => {
+  const names = [dest1.value, dest2.value, dest3.value, dest4.value];
+  const filteredNames = [];
+  names.forEach((it) => {
+    if (it != null) {
+      filteredNames.push(planetList.value[it].name);
+    }
+  });
+
+  return filteredNames;
+});
+
+const selectedVehicleNames = computed(() => {
+  const vehicleNames = [v1.value, v2.value, v3.value, v4.value];
+  const filteredNames = [];
+  vehicleNames.forEach((it) => {
+    if (it != null && it >= 0) {
+      filteredNames.push(vehicleList.value[it].name);
+    }
+  });
+  return filteredNames;
+});
 //Get token as soon as app starts
 onMounted(() => {
   get_token();
 });
-
-//utility function for creating map
-function createFMap(arr) {
-  const frequencyMap = new Map();
-
-  for (const element of arr) {
-    frequencyMap.set(element, (frequencyMap.get(element) || 0) + 1);
-  }
-
-  return frequencyMap;
-}
 </script>
 
 <template>
-  <div class="container-fluid px-0" style="background-color: aqua;">
+  <div class="container-fluid px-0" style="background-color: aqua">
     <div class="row">
       <div class="col">
         <h1>Finding Falcone</h1>
@@ -213,6 +252,20 @@ function createFMap(arr) {
         </h1>
       </div>
     </div>
+    <div class="row justify-content-center">
+      <button style="width: fit-content" @click="onClickButton()">Find</button>
+    </div>
+    <div class="row justify-content-center">
+      <h2 style="width: fit-content; margin-top: 10px" v-if="isSuccess == true">
+        Found on planet {{ foundPlanet }}
+      </h2>
+      <h2
+        style="width: fit-content; margin-top: 10px"
+        v-if="isSuccess == false"
+      >
+        Not found on any planet
+      </h2>
+    </div>
   </div>
 
   <h1></h1>
@@ -226,5 +279,4 @@ html {
   width: 100%;
   height: 100%;
 }
-
 </style>

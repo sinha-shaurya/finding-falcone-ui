@@ -1,6 +1,12 @@
 <script setup>
-import { ref, watch } from "vue";
-const props = defineProps(["planets", "vehicles", "planet", "vehicle", "componentNumber"]);
+import { ref } from "vue";
+const props = defineProps([
+  "planets",
+  "vehicles",
+  "planet",
+  "vehicle",
+  "componentNumber",
+]);
 const emit = defineEmits(["update:planet", "update:vehicle"]);
 
 function handleDestinationChange(event) {
@@ -9,7 +15,6 @@ function handleDestinationChange(event) {
 
 const selectedVehicle = ref("");
 const handleVehicleChange = () => {
-  console.log("value emitted", selectedVehicle.value);
   emit("update:vehicle", {
     index: selectedVehicle.value,
     componentNumber: props.componentNumber,
@@ -41,7 +46,7 @@ const handleVehicleChange = () => {
         :value="index"
         @change="handleVehicleChange"
         v-model="selectedVehicle"
-        :disabled="item.total_no<=0"
+        :disabled="item.total_no <= 0"
       />
       {{ item.name }} ({{ item.total_no }})
     </label>
