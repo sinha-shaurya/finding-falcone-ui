@@ -1,13 +1,20 @@
 <script setup>
-import { ref } from "vue";
-defineProps(["planets", "vehicles", "planet"]);
-const emit = defineEmits(["update:planet"]);
+import { ref, watch } from "vue";
+const props = defineProps(["planets", "vehicles", "planet", "vehicle", "componentNumber"]);
+const emit = defineEmits(["update:planet", "update:vehicle"]);
 
 function handleDestinationChange(event) {
   emit("update:planet", event.target.value);
 }
 
-const formId = ref(Math.random().toString(36).substring(2, 7));
+const selectedVehicle = ref("");
+const handleVehicleChange = () => {
+  console.log("value emitted", selectedVehicle.value);
+  emit("update:vehicle", {
+    index: selectedVehicle.value,
+    componentNumber: props.componentNumber,
+  });
+};
 </script>
 
 <template>
@@ -28,12 +35,16 @@ const formId = ref(Math.random().toString(36).substring(2, 7));
       </option>
     </select>
 
-    <div class="form-check">
-      <label v-for="vehicle in vehicles" :key="vehicle.total_no">
-        <input type="radio" class="form-check-input" name="vehicleGroup" /> 
-        {{ vehicle.name +"("+vehicle.total_no+")"}}
-      </label>
-    </div>
+    <label v-for="(item, index) in vehicles" :key="index">
+      <input
+        type="radio"
+        :value="index"
+        @change="handleVehicleChange"
+        v-model="selectedVehicle"
+        :disabled="item.total_no<=0"
+      />
+      {{ item.name }} ({{ item.total_no }})
+    </label>
   </div>
 </template>
 
