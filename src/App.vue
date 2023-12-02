@@ -100,13 +100,6 @@ function fetchVehicles() {
 }
 
 //Dynamically adjust list based on chosen options
-watch([v1, v2, v3, v4], (indices) => {});
-
-const originalMap = computed(() => {
-  //create map
-  const fmap = createFMap(originalMap.value);
-  return fmap;
-});
 
 watch(v1, (newValue) => {
   if (pv1.value >= 0) refVehiclesList.value[pv1.value].total_no += 1;
@@ -148,6 +141,10 @@ const handleVehicleUpdate = (newValue) => {
       v4.value = newValue.index;
   }
 };
+
+//Button Click Handling
+const time = ref(0);
+
 //Get token as soon as app starts
 onMounted(() => {
   get_token();
@@ -166,7 +163,7 @@ function createFMap(arr) {
 </script>
 
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid px-0" style="background-color: aqua;">
     <div class="row">
       <div class="col">
         <h1>Finding Falcone</h1>
@@ -210,6 +207,11 @@ function createFMap(arr) {
           :componentNumber="4"
         />
       </div>
+      <div class="col">
+        <h1>
+          {{ time }}
+        </h1>
+      </div>
     </div>
   </div>
 
@@ -217,7 +219,12 @@ function createFMap(arr) {
 </template>
 
 <style scoped>
-.col {
-  width: auto;
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
 }
+
 </style>
