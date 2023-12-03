@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
-import DestinationComponent from "./components/DestinationComponent.vue";
-import SearchScreenComponent from "./components/SearchScreenComponent.vue";
+import { useRouter } from "vue-router";
+import DestinationComponent from "./DestinationComponent.vue";
+import SearchScreenComponent from "./SearchScreenComponent.vue";
 const base_url = "https://findfalcone.geektrust.com";
 
 const token = ref(null);
@@ -140,39 +141,6 @@ const handleVehicleUpdate = (newValue) => {
   }
 };
 
-//Button Click Handling
-
-const foundPlanet = ref(null);
-const isSuccess = ref(null);
-
-function onClickButton() {
-  const url = base_url + "/find";
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", url, true);
-  //set headers
-  xhr.setRequestHeader("Accept", "application/json");
-  xhr.setRequestHeader("Content-Type", "application/json");
-
-  xhr.onload = () => {
-    if (xhr.status >= 200 && xhr.status < 300) {
-      const response = JSON.parse(xhr.responseText);
-      //check for success
-      if (response.status === "false") {
-        isSuccess.value = false;
-      } else if (response.status === "success") {
-        isSuccess.value = true;
-        foundPlanet.value = response.planet_name;
-      }
-    }
-  };
-  const params = {
-    token: token.value,
-    planet_names: selectedPlanetNames.value,
-    vehicle_names: selectedVehicleNames.value,
-  };
-  xhr.send(JSON.stringify(params));
-}
-
 const selectedPlanetNames = computed(() => {
   const names = [dest1.value, dest2.value, dest3.value, dest4.value];
   const filteredNames = [];
@@ -209,6 +177,24 @@ const time = computed(() => {
   return t;
 });
 
+const router = useRouter();
+
+//Button Click Handling
+const navigateToSearchScreen = () => {
+  //build the data first
+  const request = {
+    token: token.value,
+    planet_names: selectedPlanetNames.value,
+    vehicle_names: selectedVehicleNames.value,
+  };
+  //console.log(request);
+  router.push({
+    name: "search",
+    path: "/search",
+    query: { data: JSON.stringify({ request: request, time: time.value }) },
+    component: SearchScreenComponent,
+  });
+};
 //Get token as soon as app starts
 onMounted(() => {
   get_token();
@@ -222,50 +208,54 @@ onMounted(() => {
         <h1>Finding Falcone</h1>
       </div>
     </div>
-
-    <div class="row">
-      <div class="col">
-        <DestinationComponent
-          :planets="planetList"
-          :vehicles="vehicleList"
-          v-model:planet="dest1"
-          @update:vehicle="handleVehicleUpdate"
-          :componentNumber="1"
-        />
-      </div>
-      <div class="col">
-        <DestinationComponent
-          :planets="planetList"
-          :vehicles="vehicleList"
-          v-model:planet="dest2"
-          @update:vehicle="handleVehicleUpdate"
-          :componentNumber="2"
-        />
-      </div>
-      <div class="col">
-        <DestinationComponent
-          :planets="planetList"
-          :vehicles="vehicleList"
-          v-model:planet="dest3"
-          @update:vehicle="handleVehicleUpdate"
-          :componentNumber="3"
-        />
-      </div>
-      <div class="col">
-        <DestinationComponent
-          :planets="planetList"
-          :vehicles="vehicleList"
-          v-model:planet="dest4"
-          @update:vehicle="handleVehicleUpdate"
-          :componentNumber="4"
-        />
-      </div>
-      <div class="col">
-        <h1>Time taken: {{ time }}</h1>
+    <div class="card" style="padding-inline: 10px;padding-block: 20px;">
+      <div class="row">
+        <div class="col">
+          <DestinationComponent
+            :planets="planetList"
+            :vehicles="vehicleList"
+            v-model:planet="dest1"
+            @update:vehicle="handleVehicleUpdate"
+            :componentNumber="1"
+          />
+        </div>
+        <div class="col">
+          <DestinationComponent
+            :planets="planetList"
+            :vehicles="vehicleList"
+            v-model:planet="dest2"
+            @update:vehicle="handleVehicleUpdate"
+            :componentNumber="2"
+          />
+        </div>
+        <div class="col">
+          <DestinationComponent
+            :planets="planetList"
+            :vehicles="vehicleList"
+            v-model:planet="dest3"
+            @update:vehicle="handleVehicleUpdate"
+            :componentNumber="3"
+          />
+        </div>
+        <div class="col">
+          <DestinationComponent
+            :planets="planetList"
+            :vehicles="vehicleList"
+            v-model:planet="dest4"
+            @update:vehicle="handleVehicleUpdate"
+            :componentNumber="4"
+          />
+        </div>
       </div>
     </div>
     <div class="row justify-content-center">
-      <button style="width: fit-content" @click="onClickButton()">Find</button>
+      <button
+        style="width: fit-content; margin-top: 30px"
+        class="btn btn-primary"
+        @click="navigateToSearchScreen"
+      >
+        Find
+      </button>
     </div>
     <!-- <div class="row justify-content-center">
       <h2 style="width: fit-content; margin-top: 20px" v-if="isSuccess == true">
@@ -278,7 +268,6 @@ onMounted(() => {
         Not found on any planet
       </h2>
     </div> -->
-    <SearchScreenComponent v-show="true" />
   </div>
 
   <h1></h1>

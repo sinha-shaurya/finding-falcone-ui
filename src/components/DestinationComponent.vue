@@ -42,7 +42,7 @@ function cannotTravel(distance) {
 
 <template>
   <div>
-    <label class="text-nowrap">Destination</label>
+    <label >Destination {{ componentNumber }}</label>
     <select
       class="form-control"
       :value="planet"
