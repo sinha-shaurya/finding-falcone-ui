@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const isSuccess = ref(null);
 const planet = ref(null);
@@ -41,6 +41,10 @@ function findFalcone() {
   xhr.send(JSON.stringify(request.value));
 }
 
+const router = useRouter();
+const goBack=()=>{
+  router.go(-1);
+}
 onMounted(() => {
   findFalcone();
 });
@@ -55,9 +59,7 @@ onMounted(() => {
       <h1 v-if="isSuccess">Found on Planet {{ planet }}</h1>
       <h1 v-else>Not Found on any planet</h1>
     </div>
-    <button class="btn btn-primary">
-      Go Back
-    </button>
+    <button class="btn btn-primary" @click="goBack">Go Back</button>
   </div>
 </template>
 
