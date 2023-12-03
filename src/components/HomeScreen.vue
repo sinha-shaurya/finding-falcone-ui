@@ -278,7 +278,7 @@ onMounted(() => {
         Not found on any planet
       </h2>
     </div> -->
-    <SearchScreenComponent v-show="true"/>
+    <SearchScreenComponent v-show="true" />
   </div>
 
   <h1></h1>

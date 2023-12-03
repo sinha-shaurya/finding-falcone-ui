@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 const props = defineProps([
   "planets",
   "vehicles",
@@ -8,23 +8,36 @@ const props = defineProps([
   "componentNumber",
 ]);
 const emit = defineEmits(["update:planet", "update:vehicle"]);
-const selectedPlanet = ref(null);
+const selectedPlanet = ref(0);
 
 function handleDestinationChange(event) {
-  selectedPlanet.value = props.planets[event.target.value];
+  selectedPlanet.value = props.planets[event.target.value].distance;
+  //check for compatability
+  if (
+    currentVehicleObject.value != null &&
+    cannotTravel(currentVehicleObject.value.max_distance)
+  ) {
+    //reset selection to null
+    selectedVehicleIndex.value = null;
+  }
+
   emit("update:planet", event.target.value);
 }
 
 const selectedVehicleIndex = ref("");
-const selectedVehicleObject = ref(null);
+const currentVehicleObject = ref(null);
+
 const handleVehicleChange = () => {
-  selectedVehicleObject.value = props.vehicles[selectedVehicleIndex.value];
+  currentVehicleObject.value = props.vehicles[selectedVehicleIndex.value];
   emit("update:vehicle", {
     index: selectedVehicleIndex.value,
     componentNumber: props.componentNumber,
   });
 };
 
+function cannotTravel(distance) {
+  return distance < selectedPlanet.value;
+}
 </script>
 
 <template>
@@ -51,7 +64,7 @@ const handleVehicleChange = () => {
         :value="index"
         @change="handleVehicleChange"
         v-model="selectedVehicleIndex"
-        :disabled="item.total_no <= 0"
+        :disabled="item.total_no <= 0 || cannotTravel(item.max_distance)"
       />
       {{ item.name }} ({{ item.total_no }})
     </label>
