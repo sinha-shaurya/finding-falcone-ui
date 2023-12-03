@@ -1,6 +1,6 @@
 # finding-falcone-ui
 
-This template should help get you started developing with Vue 3 in Vite.
+This is the GeekTrust Finding Falcone UI challenge made with Vue 3 Composition API.
 
 ## Recommended IDE Setup
 
