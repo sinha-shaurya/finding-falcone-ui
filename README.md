@@ -27,7 +27,11 @@ npm run dev
 ```sh
 npm run build
 ```
-
+### Run production preview locally
+```sh
+npm run preview
+```
+Follow the link as given in the terminal upon run to open UI
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
