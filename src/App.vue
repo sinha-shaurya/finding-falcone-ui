@@ -141,7 +141,7 @@ const handleVehicleUpdate = (newValue) => {
 };
 
 //Button Click Handling
-const time = ref(0);
+
 const foundPlanet = ref(null);
 const isSuccess = ref(null);
 
@@ -195,6 +195,20 @@ const selectedVehicleNames = computed(() => {
   });
   return filteredNames;
 });
+
+//Calculate Time
+const time = computed(() => {
+  let t = 0;
+  const dest = [dest1.value, dest2.value, dest3.value, dest4.value];
+  const v = [v1.value, v2.value, v3.value, v4.value];
+  for (let i = 0; i < 4; i++) {
+    if (dest[i] != null && v[i] != null && v[i] >= 0) {
+      t += planetList.value[dest[i]].distance / vehicleList.value[v[i]].speed;
+    }
+  }
+  return t;
+});
+
 //Get token as soon as app starts
 onMounted(() => {
   get_token();
@@ -247,9 +261,7 @@ onMounted(() => {
         />
       </div>
       <div class="col">
-        <h1>
-          {{ time }}
-        </h1>
+        <h1>Time taken: {{ time }}</h1>
       </div>
     </div>
     <div class="row justify-content-center">

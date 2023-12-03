@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 const props = defineProps([
   "planets",
   "vehicles",
@@ -8,18 +8,23 @@ const props = defineProps([
   "componentNumber",
 ]);
 const emit = defineEmits(["update:planet", "update:vehicle"]);
+const selectedPlanet = ref(null);
 
 function handleDestinationChange(event) {
+  selectedPlanet.value = props.planets[event.target.value];
   emit("update:planet", event.target.value);
 }
 
-const selectedVehicle = ref("");
+const selectedVehicleIndex = ref("");
+const selectedVehicleObject = ref(null);
 const handleVehicleChange = () => {
+  selectedVehicleObject.value = props.vehicles[selectedVehicleIndex.value];
   emit("update:vehicle", {
-    index: selectedVehicle.value,
+    index: selectedVehicleIndex.value,
     componentNumber: props.componentNumber,
   });
 };
+
 </script>
 
 <template>
@@ -45,7 +50,7 @@ const handleVehicleChange = () => {
         type="radio"
         :value="index"
         @change="handleVehicleChange"
-        v-model="selectedVehicle"
+        v-model="selectedVehicleIndex"
         :disabled="item.total_no <= 0"
       />
       {{ item.name }} ({{ item.total_no }})
